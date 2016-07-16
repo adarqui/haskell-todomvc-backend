@@ -10,7 +10,7 @@ module Web.TodoMVC.Servant.Shared (
   Store,
   LnAPI,
   todoAPI,
-  newBigState,
+  newAppState,
   runApp,
   runApp_Maybe,
   apply2
@@ -24,13 +24,13 @@ import           Control.Lens
 import           Servant
 import           Todo
 
-data BigState = BigState {
+data AppState = AppState {
   _todoApp :: TodoApp
 }
 
-makeLenses ''BigState
+makeLenses ''AppState
 
-type Store = TVar BigState
+type Store = TVar AppState
 
 type LnAPI =
        "html" :> Raw
@@ -52,10 +52,10 @@ type LnAPI =
 todoAPI :: Proxy LnAPI
 todoAPI = Proxy
 
--- | newBigState
+-- | newAppState
 --
-newBigState :: IO (TVar BigState)
-newBigState = newTVarIO $ BigState newTodoApp
+newAppState :: IO (TVar AppState)
+newAppState = newTVarIO $ AppState newTodoApp
 
 -- | runApp
 --

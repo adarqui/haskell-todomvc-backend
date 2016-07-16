@@ -51,5 +51,5 @@ app store = serve todoAPI $ server store
 runServer :: Int -> IO ()
 runServer port = do
   putStrLn $ "We will be listening on port " <> show port
-  store <- newBigState
+  store <- newAppState
   run port $ app store
