@@ -15,11 +15,16 @@ module Todo.App (
   incrTodoAppCounter
 ) where
 
-import           Control.Lens
-import           Control.Monad.State.Lazy
-import qualified Data.Map                 as M
+
+
+import           Control.Lens             (set, to, use, (%=), (+=), (.=))
+import           Control.Monad.State.Lazy (gets)
+import qualified Data.Map                 as M (delete, elems, empty, insert,
+                                                lookup, update)
 import           Data.Text                (Text)
 import           Todo.Types
+
+
 
 -- | newTodoApp
 --
@@ -27,10 +32,12 @@ newTodoApp :: TodoApp
 newTodoApp = TodoApp M.empty 0
 
 
+
 -- | listTodos
 --
 listTodos :: TodoAppState [Todo]
 listTodos = use (todoAppTodos . to M.elems)
+
 
 
 -- | addTodo
@@ -43,6 +50,7 @@ addTodo todo = do
   pure new_todo
 
 
+
 -- | removeTodo
 --
 removeTodo :: TodoId -> TodoAppState (Maybe TodoId)
@@ -52,6 +60,7 @@ removeTodo tid = do
 
   where
   del = todoAppTodos %= M.delete tid >> (pure . pure) tid
+
 
 
 -- | updateTodo
@@ -68,10 +77,12 @@ updateTodo tid updated_todo = do
     (pure . pure) new_todo
 
 
+
 -- | findTodoById
 --
 findTodoById :: TodoId -> TodoAppState (Maybe Todo)
 findTodoById tid =  M.lookup tid <$> gets _todoAppTodos
+
 
 
 -- | clearTodos
@@ -82,6 +93,7 @@ clearTodos = do
   pure True
 
 
+
 -- | incrTodoAppCounter
 --
 incrTodoAppCounter :: TodoAppState TodoId
@@ -90,10 +102,12 @@ incrTodoAppCounter = do
   gets _todoAppCounter
 
 
+
 -- | defaultTodo
 --
 defaultTodo :: Text -> Todo
 defaultTodo title = Todo 0 title Active
+
 
 
 -- | runTodoGrammar
@@ -101,9 +115,9 @@ defaultTodo title = Todo 0 title Active
 -- our todo application grammar in its entirety.
 --
 runTodoGrammar :: TodoActionRequest -> TodoAppState TodoActionResponse
-runTodoGrammar ReqListTodos              = RespListTodos           <$> listTodos
-runTodoGrammar (ReqAddTodo todo)         = (RespAddTodo . Just)    <$> addTodo todo
-runTodoGrammar (ReqRemoveTodo tid)       = RespRemoveTodo          <$> removeTodo tid
-runTodoGrammar (ReqUpdateTodo tid todo)  = RespUpdateTodo          <$> updateTodo tid todo
-runTodoGrammar (ReqFindTodoById tid)     = RespFindTodoById        <$> findTodoById tid
-runTodoGrammar ReqClearTodos             = RespClearTodos          <$> clearTodos
+runTodoGrammar ReqListTodos              = RespListTodos        <$> listTodos
+runTodoGrammar (ReqAddTodo todo)         = (RespAddTodo . Just) <$> addTodo todo
+runTodoGrammar (ReqRemoveTodo tid)       = RespRemoveTodo       <$> removeTodo tid
+runTodoGrammar (ReqUpdateTodo tid todo)  = RespUpdateTodo       <$> updateTodo tid todo
+runTodoGrammar (ReqFindTodoById tid)     = RespFindTodoById     <$> findTodoById tid
+runTodoGrammar ReqClearTodos             = RespClearTodos       <$> clearTodos
