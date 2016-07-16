@@ -16,13 +16,18 @@ module Web.TodoMVC.Servant.Shared (
   apply2
 ) where
 
-import           Control.Concurrent.STM
-import           Control.Monad.IO.Class
-import           Control.Monad.State
-import           Control.Monad.Trans.Except
-import           Control.Lens
+
+
+import           Control.Concurrent.STM     (TVar, atomically, newTVarIO,
+                                             readTVar, writeTVar)
+import           Control.Lens               (makeLenses, set)
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Control.Monad.State        (State, runState)
+import           Control.Monad.Trans.Except (ExceptT)
 import           Servant
-import           Todo
+import           Todo                       (Todo, TodoApp, TodoId, newTodoApp)
+
+
 
 data AppState = AppState {
   _todoApp :: TodoApp
@@ -30,7 +35,11 @@ data AppState = AppState {
 
 makeLenses ''AppState
 
+
+
 type Store = TVar AppState
+
+
 
 type LnAPI =
        "html" :> Raw
@@ -49,13 +58,19 @@ type LnAPI =
   :<|> "todos" :> Capture "todo_id" TodoId :> Delete '[JSON] TodoId
   :<|> "todos" :> Capture "todo_id" TodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
 
+
+
 todoAPI :: Proxy LnAPI
 todoAPI = Proxy
+
+
 
 -- | newAppState
 --
 newAppState :: IO (TVar AppState)
 newAppState = newTVarIO $ AppState newTodoApp
+
+
 
 -- | runApp
 --
@@ -69,12 +84,16 @@ runApp store cb = do
     writeTVar store (set todoApp s v)
     pure a
 
+
+
 -- | runApp_Maybe
 --
 -- pures an error if our todo action pures Nothing
 --
 runApp_Maybe :: MonadIO m => Store -> State TodoApp (Maybe b) -> ExceptT ServantErr m b
 runApp_Maybe store cb = runApp store cb >>= maybe (throwError err400) pure
+
+
 
 -- | apply2
 --
