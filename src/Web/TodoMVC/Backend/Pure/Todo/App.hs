@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module Todo.App (
+module Web.TodoMVC.Backend.Pure.Todo.App (
   newTodoApp,
   defaultTodo,
   listTodos,
@@ -17,12 +17,14 @@ module Todo.App (
 
 
 
-import           Control.Lens             (set, to, use, (%=), (+=), (.=))
-import           Control.Monad.State.Lazy (gets)
-import qualified Data.Map                 as M (delete, elems, empty, insert,
-                                                lookup, update)
-import           Data.Text                (Text)
-import           Todo.Types
+import           Control.Lens                        (set, to, use, (%=), (+=),
+                                                      (.=))
+import           Control.Monad.State.Lazy            (gets)
+import qualified Data.Map                            as M (delete, elems, empty,
+                                                           insert, lookup,
+                                                           update)
+import           Data.Text                           (Text)
+import           Web.TodoMVC.Backend.Pure.Todo.Types
 
 
 

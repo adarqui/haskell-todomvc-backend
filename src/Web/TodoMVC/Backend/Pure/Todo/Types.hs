@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Todo.Types (
+module Web.TodoMVC.Backend.Pure.Todo.Types (
   Todo (..),
   TodoActionRequest (..),
   TodoActionResponse (..),

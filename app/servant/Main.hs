@@ -4,8 +4,8 @@ module Main (
 
 
 
-import           System.Environment      (getArgs)
-import           Web.TodoMVC.Servant.API (runServer)
+import           System.Environment              (getArgs)
+import           Web.TodoMVC.Backend.Servant.API (runServer)
 
 
 

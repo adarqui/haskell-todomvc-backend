@@ -13,8 +13,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Web.TodoMVC.Backend
-                       Web.TodoMVC.Backend.Servant
+  exposed-modules:     Web.TodoMVC.Backend.Servant
                        Web.TodoMVC.Backend.Servant.API
                        Web.TodoMVC.Backend.Servant.Shared
                        Web.TodoMVC.Backend.Pure.Todo

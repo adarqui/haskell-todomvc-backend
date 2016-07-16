@@ -6,7 +6,7 @@
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module Web.TodoMVC.Servant.Shared (
+module Web.TodoMVC.Backend.Servant.Shared (
   Store,
   LnAPI,
   todoAPI,
@@ -18,14 +18,15 @@ module Web.TodoMVC.Servant.Shared (
 
 
 
-import           Control.Concurrent.STM     (TVar, atomically, newTVarIO,
-                                             readTVar, writeTVar)
-import           Control.Lens               (makeLenses, set)
-import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import           Control.Monad.State        (State, runState)
-import           Control.Monad.Trans.Except (ExceptT)
+import           Control.Concurrent.STM        (TVar, atomically, newTVarIO,
+                                                readTVar, writeTVar)
+import           Control.Lens                  (makeLenses, set)
+import           Control.Monad.IO.Class        (MonadIO, liftIO)
+import           Control.Monad.State           (State, runState)
+import           Control.Monad.Trans.Except    (ExceptT)
 import           Servant
-import           Todo                       (Todo, TodoApp, TodoId, newTodoApp)
+import           Web.TodoMVC.Backend.Pure.Todo (Todo, TodoApp, TodoId,
+                                                newTodoApp)
 
 
 

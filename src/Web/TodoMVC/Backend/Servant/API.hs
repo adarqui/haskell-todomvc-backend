@@ -5,20 +5,22 @@
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module Web.TodoMVC.Servant.API (
+module Web.TodoMVC.Backend.Servant.API (
   runServer
 ) where
 
 
 
-import           Data.Monoid                ((<>))
-import           Network.Wai                (Application)
-import           Network.Wai.Handler.Warp   (run)
+import           Data.Monoid                        ((<>))
+import           Network.Wai                        (Application)
+import           Network.Wai.Handler.Warp           (run)
 import           Servant
-import           Todo                       (addTodo, clearTodos, findTodoById,
-                                             listTodos, removeTodo, updateTodo)
-import           Web.TodoMVC.Servant.Shared (LnAPI, Store, apply2, newAppState,
-                                             runApp, runApp_Maybe, todoAPI)
+import           Web.TodoMVC.Backend.Pure.Todo      (addTodo, clearTodos,
+                                                     findTodoById, listTodos,
+                                                     removeTodo, updateTodo)
+import           Web.TodoMVC.Backend.Servant.Shared (LnAPI, Store, apply2,
+                                                     newAppState, runApp,
+                                                     runApp_Maybe, todoAPI)
 
 
 

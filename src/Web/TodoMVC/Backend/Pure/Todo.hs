@@ -1,8 +1,8 @@
-module Todo (
+module Web.TodoMVC.Backend.Pure.Todo (
   module A
 ) where
 
 
 
-import           Todo.App   as A
-import           Todo.Types as A
+import           Web.TodoMVC.Backend.Pure.Todo.App   as A
+import           Web.TodoMVC.Backend.Pure.Todo.Types as A
