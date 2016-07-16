@@ -12,11 +12,13 @@ module Web.TodoMVC.Servant.API (
 
 
 import           Data.Monoid                ((<>))
-import           Network.Wai
-import           Network.Wai.Handler.Warp
+import           Network.Wai                (Application)
+import           Network.Wai.Handler.Warp   (run)
 import           Servant
-import           Todo
-import           Web.TodoMVC.Servant.Shared
+import           Todo                       (addTodo, clearTodos, findTodoById,
+                                             listTodos, removeTodo, updateTodo)
+import           Web.TodoMVC.Servant.Shared (LnAPI, Store, apply2, newAppState,
+                                             runApp, runApp_Maybe, todoAPI)
 
 
 
@@ -39,7 +41,7 @@ server store =
 -- | app
 --
 app :: Store -> Application
-app store = serve todoAPI $ server store
+app = serve todoAPI . server
 
 
 
