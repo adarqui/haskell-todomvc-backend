@@ -19,7 +19,7 @@ module Web.TodoMVC.Servant.Shared (
 import           Control.Concurrent.STM
 import           Control.Monad.IO.Class
 import           Control.Monad.State
-import           Control.Monad.Trans.Either
+import           Control.Monad.Trans.Except
 import           Control.Lens
 import           Servant
 import           Todo
@@ -61,7 +61,7 @@ newBigState = newTVarIO $ BigState newTodoApp
 --
 -- simple todo application helper
 --
-runApp :: MonadIO m => Store -> State TodoApp b -> EitherT ServantErr m b
+runApp :: MonadIO m => Store -> State TodoApp b -> ExceptT ServantErr m b
 runApp store cb = do
   liftIO $ atomically $ do
     v <- readTVar store
@@ -73,12 +73,12 @@ runApp store cb = do
 --
 -- returns an error if our todo action returns Nothing
 --
-runApp_Maybe :: MonadIO m => Store -> State TodoApp (Maybe b) -> EitherT ServantErr m b
-runApp_Maybe store cb = runApp store cb >>= maybe (left err400) return
+runApp_Maybe :: MonadIO m => Store -> State TodoApp (Maybe b) -> ExceptT ServantErr m b
+runApp_Maybe store cb = runApp store cb >>= maybe (throwError err400) return
 
 -- | apply2
 --
 -- bleh: having some weird type errors
 --
-apply2 :: MonadIO m => (t -> t1 -> State TodoApp (Maybe b)) -> Store -> t -> t1 -> EitherT ServantErr m b
+apply2 :: MonadIO m => (t -> t1 -> State TodoApp (Maybe b)) -> Store -> t -> t1 -> ExceptT ServantErr m b
 apply2 f s x y = runApp_Maybe s (f x y)
