@@ -67,14 +67,14 @@ runApp store cb = do
     v <- readTVar store
     let (a, s) = runState cb (_todoApp v)
     writeTVar store (set todoApp s v)
-    return a
+    pure a
 
 -- | runApp_Maybe
 --
--- returns an error if our todo action returns Nothing
+-- pures an error if our todo action pures Nothing
 --
 runApp_Maybe :: MonadIO m => Store -> State TodoApp (Maybe b) -> ExceptT ServantErr m b
-runApp_Maybe store cb = runApp store cb >>= maybe (throwError err400) return
+runApp_Maybe store cb = runApp store cb >>= maybe (throwError err400) pure
 
 -- | apply2
 --
