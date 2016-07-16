@@ -19,14 +19,19 @@ module Todo.Types (
 ) where
 
 
-import           Control.Lens
-import           Control.Monad.State
-import           Data.Aeson
-import qualified Data.Map            as M
+
+import           Control.Lens        (makeLenses)
+import           Control.Monad.State (State)
+import           Data.Aeson          (FromJSON, ToJSON)
+import qualified Data.Map            as M (Map)
 import           Data.Text           (Text)
-import           GHC.Generics
+import           GHC.Generics        (Generic)
+
+
 
 type TodoId = Int
+
+
 
 data TodoState
   = Active
@@ -35,6 +40,8 @@ data TodoState
 
 instance FromJSON TodoState
 instance ToJSON TodoState
+
+
 
 data Todo = Todo {
   _todoId    :: TodoId,
@@ -47,6 +54,8 @@ makeLenses ''Todo
 instance FromJSON Todo
 instance ToJSON Todo
 
+
+
 data TodoActionRequest
   = ReqListTodos
   | ReqAddTodo Todo
@@ -55,6 +64,8 @@ data TodoActionRequest
   | ReqFindTodoById TodoId
   | ReqClearTodos
   deriving (Show, Eq, Ord, Generic)
+
+
 
 data TodoActionResponse
   = RespListTodos [Todo]
@@ -65,11 +76,15 @@ data TodoActionResponse
   | RespClearTodos Bool
   deriving (Show, Eq, Ord, Generic)
 
+
+
 data TodoApp = TodoApp {
   _todoAppTodos   :: M.Map TodoId Todo,
   _todoAppCounter :: TodoId
 } deriving (Show, Eq, Ord, Generic)
 
 makeLenses ''TodoApp
+
+
 
 type TodoAppState a = State TodoApp a
