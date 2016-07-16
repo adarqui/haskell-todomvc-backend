@@ -9,11 +9,16 @@ module Web.TodoMVC.Servant.API (
   runServer
 ) where
 
+
+
+import           Data.Monoid                ((<>))
 import           Network.Wai
 import           Network.Wai.Handler.Warp
 import           Servant
 import           Todo
 import           Web.TodoMVC.Servant.Shared
+
+
 
 -- | server
 --
@@ -29,17 +34,22 @@ server store =
   :<|> runApp_Maybe store . removeTodo
   :<|> apply2 updateTodo store -- bleh
 
+
+
 -- | app
 --
 app :: Store -> Application
 app store = serve todoAPI $ server store
 
+
+
 -- | runServer
 --
 -- runs the API servers on:
--- http://localhost:1080
+-- http://localhost:port
 --
-runServer :: IO ()
-runServer = do
+runServer :: Int -> IO ()
+runServer port = do
+  putStrLn $ "We will be listening on port " <> show port
   store <- newBigState
-  run 1080 $ app store
+  run port $ app store
