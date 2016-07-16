@@ -13,13 +13,13 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:
-    Web.TodoMVC.Servant
-    Web.TodoMVC.Servant.API
-    Web.TodoMVC.Servant.Shared
-    Todo
-    Todo.App
-    Todo.Types
+  exposed-modules:     Web.TodoMVC.Backend
+                       Web.TodoMVC.Backend.Servant
+                       Web.TodoMVC.Backend.Servant.API
+                       Web.TodoMVC.Backend.Servant.Shared
+                       Web.TodoMVC.Backend.Pure.Todo
+                       Web.TodoMVC.Backend.Pure.Todo.App
+                       Web.TodoMVC.Backend.Pure.Todo.Types
   build-depends:       base >=4.7 && <4.9
                      , aeson
                      , containers
