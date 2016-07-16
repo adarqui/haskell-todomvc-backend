@@ -10,7 +10,7 @@ module Web.TodoMVC.Servant.API (
 ) where
 
 import           Network.Wai
-import           Network.Wai.Handler.Warp   hiding (Connection)
+import           Network.Wai.Handler.Warp
 import           Servant
 import           Todo
 import           Web.TodoMVC.Servant.Shared
