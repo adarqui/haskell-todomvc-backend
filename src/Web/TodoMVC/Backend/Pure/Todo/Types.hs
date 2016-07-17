@@ -14,6 +14,10 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   TodoApp (..),
   TodoAppState,
   TodoId,
+  defaultTodoState,
+  defaultTodoRequest,
+  defaultTodoResponse,
+  defaultTodoApp,
   todoRequestTitle,
   todoResponseId,
   todoResponseTitle,
@@ -32,6 +36,7 @@ import           Control.Monad.State (State)
 import           Data.Aeson          (FromJSON, ToJSON)
 import           Data.Int            (Int64)
 import           Data.Map            (Map)
+import qualified Data.Map            as Map (empty)
 import           Data.Text           (Text)
 import           Data.Time           (UTCTime)
 import           Data.Typeable       (Typeable)
@@ -52,16 +57,23 @@ data TodoState
 instance FromJSON TodoState
 instance ToJSON TodoState
 
+defaultTodoState :: TodoState
+defaultTodoState = Active
+
 
 
 data TodoRequest = TodoRequest {
-  _todoRequestTitle :: !Text
+  _todoRequestTitle :: !Text,
+  _todoRequestState :: !TodoState
 } deriving (Show, Eq, Ord, Generic, Typeable, NFData)
 
 makeLenses ''TodoRequest
 
 instance FromJSON TodoRequest
 instance ToJSON TodoRequest
+
+defaultTodoRequest :: TodoRequest
+defaultTodoRequest = TodoRequest "" Active
 
 
 
@@ -79,6 +91,9 @@ instance FromJSON TodoResponse
 instance ToJSON TodoResponse
 
 type TodoResponses = [TodoResponse]
+
+defaultTodoResponse :: TodoResponse
+defaultTodoResponse = TodoResponse 0 "" defaultTodoState Nothing Nothing
 
 
 
@@ -111,6 +126,8 @@ data TodoApp = TodoApp {
 
 makeLenses ''TodoApp
 
-
-
 type TodoAppState a = State TodoApp a
+
+defaultTodoApp :: TodoApp
+defaultTodoApp = TodoApp Map.empty 0
+

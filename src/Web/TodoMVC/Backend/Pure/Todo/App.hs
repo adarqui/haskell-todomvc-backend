@@ -4,7 +4,6 @@
 
 module Web.TodoMVC.Backend.Pure.Todo.App (
   newTodoApp,
-  defaultTodo,
   listTodos,
   addTodo,
   removeTodo,
@@ -20,9 +19,9 @@ module Web.TodoMVC.Backend.Pure.Todo.App (
 import           Control.Lens                        (set, to, use, (%=), (+=),
                                                       (.=))
 import           Control.Monad.State.Lazy            (gets)
-import qualified Data.Map                            as M (delete, elems, empty,
+import qualified Data.Map                            as Map (delete, elems, empty,
                                                            insert, lookup,
-                                                           update)
+                                                           update, updateLookupWithKey)
 import           Data.Text                           (Text)
 import           Web.TodoMVC.Backend.Pure.Todo.Types
 
@@ -31,24 +30,24 @@ import           Web.TodoMVC.Backend.Pure.Todo.Types
 -- | newTodoApp
 --
 newTodoApp :: TodoApp
-newTodoApp = TodoApp M.empty 0
+newTodoApp = TodoApp Map.empty 0
 
 
 
 -- | listTodos
 --
-listTodos :: TodoAppState [Todo]
-listTodos = use (todoAppTodos . to M.elems)
+listTodos :: TodoAppState TodoResponses
+listTodos = use (todoAppTodos . to Map.elems)
 
 
 
 -- | addTodo
 --
-addTodo :: Todo -> TodoAppState Todo
-addTodo todo = do
+addTodo :: TodoRequest -> TodoAppState TodoResponse
+addTodo TodoRequest{..} = do
   new_id <- incrTodoAppCounter
-  let new_todo = set todoId new_id todo
-  todoAppTodos %= M.insert new_id new_todo
+  let new_todo = defaultTodoResponse { _todoResponseId = new_id, _todoResponseTitle = _todoRequestTitle }
+  todoAppTodos %= Map.insert new_id new_todo
   pure new_todo
 
 
@@ -57,33 +56,36 @@ addTodo todo = do
 --
 removeTodo :: TodoId -> TodoAppState (Maybe TodoId)
 removeTodo tid = do
-  e <- use (todoAppTodos . to (M.lookup tid))
+  e <- use (todoAppTodos . to (Map.lookup tid))
   maybe (pure Nothing) (const del) e
 
   where
-  del = todoAppTodos %= M.delete tid >> (pure . pure) tid
+  del = todoAppTodos %= Map.delete tid >> (pure . pure) tid
 
 
 
 -- | updateTodo
 --
-updateTodo :: TodoId -> Todo -> TodoAppState (Maybe Todo)
-updateTodo tid updated_todo = do
-  todo <- findTodoById tid
-  maybe (pure Nothing) (const update) todo
+updateTodo :: TodoId -> TodoRequest -> TodoAppState (Maybe TodoResponse)
+updateTodo tid TodoRequest{..} = do
+  m_todo <- findTodoById tid
+  maybe (pure Nothing) (const update) m_todo
 
   where
-  new_todo = set todoId tid updated_todo
+  alter_todo _ todo_response@TodoResponse{..} = Just $ todo_response{ _todoResponseTitle = _todoRequestTitle, _todoResponseState = _todoRequestState }
   update   = do
-    todoAppTodos %= M.update (const $ pure new_todo) tid
-    (pure . pure) new_todo
+--    let (new_todo, new_map) = Map.updateLookupWithKey alter_todo tid todoAppTodos
+--    (m_new_todo, new_map) <- (todoAppTodos %= Map.updateLookupWithKey alter_todo tid)
+--    pure m_new_todo
+    pure Nothing
+--    todoAppTodos %= Map.update new_todo tid
 
 
 
 -- | findTodoById
 --
-findTodoById :: TodoId -> TodoAppState (Maybe Todo)
-findTodoById tid =  M.lookup tid <$> gets _todoAppTodos
+findTodoById :: TodoId -> TodoAppState (Maybe TodoResponse)
+findTodoById tid =  Map.lookup tid <$> gets _todoAppTodos
 
 
 
@@ -91,7 +93,7 @@ findTodoById tid =  M.lookup tid <$> gets _todoAppTodos
 --
 clearTodos :: TodoAppState Bool
 clearTodos = do
-  todoAppTodos .= M.empty
+  todoAppTodos .= Map.empty
   pure True
 
 
@@ -102,13 +104,6 @@ incrTodoAppCounter :: TodoAppState TodoId
 incrTodoAppCounter = do
   todoAppCounter += 1
   gets _todoAppCounter
-
-
-
--- | defaultTodo
---
-defaultTodo :: Text -> Todo
-defaultTodo title = Todo 0 title Active
 
 
 

@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -25,13 +26,14 @@ import           Control.Monad.IO.Class        (MonadIO, liftIO)
 import           Control.Monad.State           (State, runState)
 import           Control.Monad.Trans.Except    (ExceptT)
 import           Servant
-import           Web.TodoMVC.Backend.Pure.Todo (Todo, TodoApp, TodoId,
+import           Web.TodoMVC.Backend.Pure.Todo (TodoApp, TodoId, TodoRequest,
+                                                TodoResponse, TodoResponses,
                                                 newTodoApp)
 
 
 
 data AppState = AppState {
-  _todoApp :: TodoApp
+  _todoApp :: !TodoApp
 }
 
 makeLenses ''AppState
@@ -42,22 +44,23 @@ type Store = TVar AppState
 
 
 
+-- | Todo API Operations
+-- GET    /todos
+-- POST   /todos
+-- DELETE /todos
+-- GET    /todos/:todo_id
+-- DELETE /todos/:todo_id
+-- PUT    /todos/:todo_id
 type LnAPI =
        "html" :> Raw
   :<|> "dist" :> Raw
   :<|> "static" :> Raw
-  -- GET /todos
-  -- POST /todos , body = Todo
-  -- DELETE /todos
-  -- GET /todos/:todo_id
-  -- DELETE /todos/:todo_id
-  -- PUT /todos/:todo_id , body = Todo
-  :<|> "todos" :> Get '[JSON] [Todo]
-  :<|> "todos" :> ReqBody '[JSON] Todo :> Post '[JSON] Todo
+  :<|> "todos" :> Get '[JSON] TodoResponses
+  :<|> "todos" :> ReqBody '[JSON] TodoRequest :> Post '[JSON] TodoResponse
   :<|> "todos" :> Delete '[JSON] Bool
-  :<|> "todos" :> Capture "todo_id" TodoId :> Get '[JSON] Todo
+  :<|> "todos" :> Capture "todo_id" TodoId :> Get '[JSON] TodoResponse
   :<|> "todos" :> Capture "todo_id" TodoId :> Delete '[JSON] TodoId
-  :<|> "todos" :> Capture "todo_id" TodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
+  :<|> "todos" :> Capture "todo_id" TodoId :> ReqBody '[JSON] TodoRequest :> Put '[JSON] TodoResponse
 
 
 
