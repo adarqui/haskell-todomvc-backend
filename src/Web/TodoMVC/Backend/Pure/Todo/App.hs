@@ -16,13 +16,12 @@ module Web.TodoMVC.Backend.Pure.Todo.App (
 
 
 
-import           Control.Lens                        (set, to, use, (%=), (+=),
+import           Control.Lens                        (to, use, (%=), (+=),
                                                       (.=))
 import           Control.Monad.State.Lazy            (gets)
 import qualified Data.Map                            as Map (delete, elems, empty,
                                                            insert, lookup,
-                                                           update, updateLookupWithKey)
-import           Data.Text                           (Text)
+                                                           update)
 import           Web.TodoMVC.Backend.Pure.Todo.Types
 
 
@@ -72,13 +71,11 @@ updateTodo tid TodoRequest{..} = do
   maybe (pure Nothing) (const update) m_todo
 
   where
-  alter_todo _ todo_response@TodoResponse{..} = Just $ todo_response{ _todoResponseTitle = _todoRequestTitle, _todoResponseState = _todoRequestState }
-  update   = do
---    let (new_todo, new_map) = Map.updateLookupWithKey alter_todo tid todoAppTodos
---    (m_new_todo, new_map) <- (todoAppTodos %= Map.updateLookupWithKey alter_todo tid)
---    pure m_new_todo
-    pure Nothing
---    todoAppTodos %= Map.update new_todo tid
+  alter_todo todo_response@TodoResponse{..} =
+    Just $ todo_response{_todoResponseTitle = _todoRequestTitle, _todoResponseState = _todoRequestState}
+  update = do
+    todoAppTodos %= Map.update alter_todo tid
+    findTodoById tid
 
 
 

@@ -130,4 +130,3 @@ type TodoAppState a = State TodoApp a
 
 defaultTodoApp :: TodoApp
 defaultTodoApp = TodoApp Map.empty 0
-
