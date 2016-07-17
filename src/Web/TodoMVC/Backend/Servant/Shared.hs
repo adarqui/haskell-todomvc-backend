@@ -19,6 +19,7 @@ module Web.TodoMVC.Backend.Servant.Shared (
 
 
 
+import Data.Time (getCurrentTime)
 import           Control.Concurrent.STM        (TVar, atomically, newTVarIO,
                                                 readTVar, writeTVar)
 import           Control.Lens                  (makeLenses, set)
@@ -26,7 +27,7 @@ import           Control.Monad.IO.Class        (MonadIO, liftIO)
 import           Control.Monad.State           (State, runState)
 import           Control.Monad.Trans.Except    (ExceptT)
 import           Servant
-import           Web.TodoMVC.Backend.Pure.Todo (TodoApp, TodoId, TodoRequest,
+import           Web.TodoMVC.Backend.Pure.Todo (TodoApp (..), TodoId, TodoRequest,
                                                 TodoResponse, TodoResponses,
                                                 newTodoApp)
 
@@ -82,10 +83,13 @@ newAppState = newTVarIO $ AppState newTodoApp
 --
 runApp :: MonadIO m => Store -> State TodoApp b -> ExceptT ServantErr m b
 runApp store cb = do
+  ts <- liftIO getCurrentTime
   liftIO $ atomically $ do
-    v <- readTVar store
-    let (a, s) = runState cb (_todoApp v)
-    writeTVar store (set todoApp s v)
+    app_state <- readTVar store
+    let
+      app_state_with_ts = app_state{_todoApp = (_todoApp app_state){ _todoAppTimestamp = Just ts}}
+    let (a, s) = runState cb (_todoApp app_state_with_ts)
+    writeTVar store (set todoApp s app_state_with_ts)
     pure a
 
 
