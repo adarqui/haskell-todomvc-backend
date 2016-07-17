@@ -11,7 +11,8 @@ module Web.TodoMVC.Backend.Pure.Todo.App (
   findTodoById,
   clearTodos,
   runTodoGrammar,
-  incrTodoAppCounter
+  incrTodoAppCounter,
+  lookupTimestamp
 ) where
 
 
@@ -21,6 +22,7 @@ import           Control.Monad.State.Lazy            (gets)
 import qualified Data.Map                            as Map (delete, elems,
                                                              empty, insert,
                                                              lookup, update)
+import           Data.Time                           (UTCTime)
 import           Web.TodoMVC.Backend.Pure.Todo.Types
 
 
@@ -44,7 +46,12 @@ listTodos = use (todoAppTodos . to Map.elems)
 addTodo :: TodoRequest -> TodoAppState TodoResponse
 addTodo TodoRequest{..} = do
   new_id <- incrTodoAppCounter
-  let new_todo = defaultTodoResponse { _todoResponseId = new_id, _todoResponseTitle = _todoRequestTitle }
+  m_ts   <- lookupTimestamp
+  let new_todo = defaultTodoResponse {
+    _todoResponseId        = new_id,
+    _todoResponseTitle     = _todoRequestTitle,
+    _todoResponseCreatedAt = m_ts
+  }
   todoAppTodos %= Map.insert new_id new_todo
   pure new_todo
 
@@ -58,7 +65,7 @@ removeTodo tid = do
   maybe (pure Nothing) (const del) e
 
   where
-  del = todoAppTodos %= Map.delete tid >> (pure . pure) tid
+  del = (todoAppTodos %= Map.delete tid) *> (pure . pure) tid
 
 
 
@@ -67,13 +74,18 @@ removeTodo tid = do
 updateTodo :: TodoId -> TodoRequest -> TodoAppState (Maybe TodoResponse)
 updateTodo tid TodoRequest{..} = do
   m_todo <- findTodoById tid
-  maybe (pure Nothing) (const update) m_todo
+  m_ts   <- lookupTimestamp
+  maybe (pure Nothing) (const $ update m_ts) m_todo
 
   where
-  alter_todo todo_response@TodoResponse{..} =
-    Just $ todo_response{_todoResponseTitle = _todoRequestTitle, _todoResponseState = _todoRequestState}
-  update = do
-    todoAppTodos %= Map.update alter_todo tid
+  alter_todo m_ts todo_response@TodoResponse{..} =
+    Just $ todo_response{
+      _todoResponseTitle      = _todoRequestTitle,
+      _todoResponseState      = _todoRequestState,
+      _todoResponseModifiedAt = m_ts
+    }
+  update m_ts = do
+    todoAppTodos %= Map.update (alter_todo m_ts) tid
     findTodoById tid
 
 
@@ -81,16 +93,14 @@ updateTodo tid TodoRequest{..} = do
 -- | findTodoById
 --
 findTodoById :: TodoId -> TodoAppState (Maybe TodoResponse)
-findTodoById tid =  Map.lookup tid <$> gets _todoAppTodos
+findTodoById tid = Map.lookup tid <$> gets _todoAppTodos
 
 
 
 -- | clearTodos
 --
 clearTodos :: TodoAppState Bool
-clearTodos = do
-  todoAppTodos .= Map.empty
-  pure True
+clearTodos = (todoAppTodos .= Map.empty) *> pure True
 
 
 
@@ -100,6 +110,13 @@ incrTodoAppCounter :: TodoAppState TodoId
 incrTodoAppCounter = do
   todoAppCounter += 1
   gets _todoAppCounter
+
+
+
+-- | lookup time stamp
+--
+lookupTimestamp :: TodoAppState (Maybe UTCTime)
+lookupTimestamp = gets _todoAppTimestamp
 
 
 
