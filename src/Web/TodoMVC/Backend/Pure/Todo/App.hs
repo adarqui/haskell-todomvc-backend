@@ -16,12 +16,11 @@ module Web.TodoMVC.Backend.Pure.Todo.App (
 
 
 
-import           Control.Lens                        (to, use, (%=), (+=),
-                                                      (.=))
+import           Control.Lens                        (to, use, (%=), (+=), (.=))
 import           Control.Monad.State.Lazy            (gets)
-import qualified Data.Map                            as Map (delete, elems, empty,
-                                                           insert, lookup,
-                                                           update)
+import qualified Data.Map                            as Map (delete, elems,
+                                                             empty, insert,
+                                                             lookup, update)
 import           Web.TodoMVC.Backend.Pure.Todo.Types
 
 
@@ -29,7 +28,7 @@ import           Web.TodoMVC.Backend.Pure.Todo.Types
 -- | newTodoApp
 --
 newTodoApp :: TodoApp
-newTodoApp = TodoApp Map.empty 0
+newTodoApp = defaultTodoApp
 
 
 

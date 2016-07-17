@@ -19,13 +19,15 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   defaultTodoResponse,
   defaultTodoApp,
   todoRequestTitle,
+  todoRequestState,
   todoResponseId,
   todoResponseTitle,
   todoResponseState,
   todoResponseCreatedAt,
   todoResponseModifiedAt,
   todoAppCounter,
-  todoAppTodos
+  todoAppTodos,
+  todoAppTimestamp
 ) where
 
 
@@ -120,8 +122,9 @@ data TodoActionResponse
 
 
 data TodoApp = TodoApp {
-  _todoAppTodos   :: !(Map TodoId TodoResponse),
-  _todoAppCounter :: !TodoId
+  _todoAppTodos     :: !(Map TodoId TodoResponse),
+  _todoAppCounter   :: !TodoId,
+  _todoAppTimestamp :: !(Maybe UTCTime)
 } deriving (Show, Eq, Ord, Generic, Typeable, NFData)
 
 makeLenses ''TodoApp
@@ -129,4 +132,4 @@ makeLenses ''TodoApp
 type TodoAppState a = State TodoApp a
 
 defaultTodoApp :: TodoApp
-defaultTodoApp = TodoApp Map.empty 0
+defaultTodoApp = TodoApp Map.empty 0 Nothing
