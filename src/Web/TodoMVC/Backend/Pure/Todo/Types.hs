@@ -58,9 +58,9 @@ instance ToJSON Todo
 
 data TodoActionRequest
   = ReqListTodos
-  | ReqAddTodo Todo
-  | ReqRemoveTodo TodoId
-  | ReqUpdateTodo TodoId Todo
+  | ReqAddTodo      Todo
+  | ReqRemoveTodo   TodoId
+  | ReqUpdateTodo   TodoId Todo
   | ReqFindTodoById TodoId
   | ReqClearTodos
   deriving (Show, Eq, Ord, Generic)
@@ -68,12 +68,12 @@ data TodoActionRequest
 
 
 data TodoActionResponse
-  = RespListTodos [Todo]
-  | RespAddTodo (Maybe Todo)
-  | RespRemoveTodo (Maybe TodoId)
-  | RespUpdateTodo (Maybe Todo)
+  = RespListTodos    [Todo]
+  | RespAddTodo      (Maybe Todo)
+  | RespRemoveTodo   (Maybe TodoId)
+  | RespUpdateTodo   (Maybe Todo)
   | RespFindTodoById (Maybe Todo)
-  | RespClearTodos Bool
+  | RespClearTodos   Bool
   deriving (Show, Eq, Ord, Generic)
 
 
