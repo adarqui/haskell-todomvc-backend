@@ -5,6 +5,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 module Web.TodoMVC.Backend.Pure.Todo.Types (
+  TodoId,
   TodoRequest (..),
   TodoResponse (..),
   TodoResponses,
@@ -13,7 +14,7 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   TodoAppState,
   Param (..),
   TodoParam (..),
-  TodoId,
+  todoParamToQueryParamsTuple,
   defaultTodoState,
   defaultTodoRequest,
   defaultTodoResponse,
@@ -44,6 +45,7 @@ import           Data.Map            (Map)
 import qualified Data.Map            as Map (empty)
 import           Data.Monoid         ((<>))
 import           Data.Text           (Text)
+import qualified Data.Text as Text (pack)
 import           Data.Time           (UTCTime)
 import           Data.Typeable       (Typeable)
 import           GHC.Generics        (Generic)
@@ -166,6 +168,14 @@ defaultTodoParam = TodoParam {
   tpOffset = Nothing,
   tpFilter = Nothing
 }
+
+todoParamToQueryParamsTuple :: TodoParam -> [(Text, Text)]
+todoParamToQueryParamsTuple TodoParam{..} =
+  limit <> offset <> filt
+  where
+  limit  = maybe [] (\x -> [("limit", Text.pack $ show x)]) tpLimit
+  offset = maybe [] (\x -> [("offset", Text.pack $ show x)]) tpOffset
+  filt   = maybe [] (\x -> [("filter", Text.pack $ show x)]) tpFilter
 
 
 
