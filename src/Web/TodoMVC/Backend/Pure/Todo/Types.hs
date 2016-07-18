@@ -8,8 +8,6 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   TodoRequest (..),
   TodoResponse (..),
   TodoResponses,
-  TodoActionRequest (..),
-  TodoActionResponse (..),
   TodoState (..),
   TodoApp (..),
   TodoAppState,
@@ -101,28 +99,6 @@ type TodoResponses = [TodoResponse]
 
 defaultTodoResponse :: TodoResponse
 defaultTodoResponse = TodoResponse 0 "" defaultTodoState Nothing Nothing
-
-
-
-data TodoActionRequest
-  = ReqListTodos
-  | ReqAddTodo      TodoRequest
-  | ReqRemoveTodo   TodoId
-  | ReqUpdateTodo   TodoId TodoRequest
-  | ReqFindTodoById TodoId
-  | ReqClearTodos
-  deriving (Show, Eq, Ord, Generic, Typeable, NFData)
-
-
-
-data TodoActionResponse
-  = RespListTodos    TodoResponses
-  | RespAddTodo      (Maybe TodoResponse)
-  | RespRemoveTodo   (Maybe TodoId)
-  | RespUpdateTodo   (Maybe TodoResponse)
-  | RespFindTodoById (Maybe TodoResponse)
-  | RespClearTodos   Bool
-  deriving (Show, Eq, Ord, Generic, Typeable, NFData)
 
 
 
