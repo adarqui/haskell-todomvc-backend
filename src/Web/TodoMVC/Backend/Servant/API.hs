@@ -31,7 +31,7 @@ server store =
        serveDirectory "./html"
   :<|> serveDirectory "./dist"
   :<|> serveDirectory "./static"
-  :<|> (runApp store .) . listTodos
+  :<|> ((runApp store .) .) . listTodos
   :<|> runApp store . addTodo
   :<|> runApp store clearTodos
   :<|> runApp_Maybe store . findTodoById

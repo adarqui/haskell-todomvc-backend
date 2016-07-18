@@ -42,10 +42,12 @@ import           Data.Aeson          (FromJSON, ToJSON)
 import           Data.Int            (Int64)
 import           Data.Map            (Map)
 import qualified Data.Map            as Map (empty)
+import           Data.Monoid         ((<>))
 import           Data.Text           (Text)
 import           Data.Time           (UTCTime)
 import           Data.Typeable       (Typeable)
 import           GHC.Generics        (Generic)
+import           Web.HttpApiData     (FromHttpApiData, parseQueryParam)
 
 
 
@@ -57,10 +59,27 @@ data TodoState
   = Active
   | Editing
   | Completed
-  deriving (Show, Eq, Ord, Generic, Typeable, NFData)
+  deriving (Eq, Ord, Generic, Typeable, NFData)
 
 instance FromJSON TodoState
 instance ToJSON TodoState
+
+instance Show TodoState where
+  show Active    = "active"
+  show Editing   = "editing"
+  show Completed = "completed"
+
+instance Read TodoState where
+  readsPrec _ "active"    = [(Active, "")]
+  readsPrec _ "editing"   = [(Editing, "")]
+  readsPrec _ "completed" = [(Completed, "")]
+  readsPrec _ _           = [(Active, "")]
+
+instance FromHttpApiData TodoState where
+  parseQueryParam "active"    = Right Active
+  parseQueryParam "editing"   = Right Editing
+  parseQueryParam "completed" = Right Completed
+  parseQueryParam _           = Left "Unable to parse TodoState"
 
 defaultTodoState :: TodoState
 defaultTodoState = Active
@@ -118,9 +137,20 @@ defaultTodoApp = TodoApp Map.empty 0 Nothing
 
 
 data Param
-  = Param_Limit Int
-  | Param_Offset Int
-  deriving (Show, Eq, Ord, Generic, Typeable, NFData)
+  = Param_Limit  !Int
+  | Param_Offset !Int
+  | Param_Filter !(Maybe TodoState)
+  deriving (Eq, Ord, Generic, Typeable, NFData)
+
+instance Show Param where
+  show (Param_Limit limit)   = "limit="  <> show limit
+  show (Param_Offset offset) = "offset=" <> show offset
+  show (Param_Filter filt)   = "filter=" <> show filt
+
+instance Read Param where
+  readsPrec _ "filter=active"    = [(Param_Filter $ Just Active, "")]
+  readsPrec _ "filter=completed" = [(Param_Filter $ Just Completed, "")]
+  readsPrec _ _                  = [(Param_Filter Nothing, "")]
 
 
 

@@ -27,7 +27,7 @@ import           Control.Monad.IO.Class        (MonadIO, liftIO)
 import           Control.Monad.State           (State, runState)
 import           Control.Monad.Trans.Except    (ExceptT)
 import           Servant
-import           Web.TodoMVC.Backend.Pure.Todo (TodoApp (..), TodoId, TodoRequest,
+import           Web.TodoMVC.Backend.Pure.Todo (TodoState, TodoApp (..), TodoId, TodoRequest,
                                                 TodoResponse, TodoResponses,
                                                 newTodoApp)
 
@@ -56,7 +56,7 @@ type LnAPI =
        "html"   :> Raw
   :<|> "dist"   :> Raw
   :<|> "static" :> Raw
-  :<|> "todos"  :> QueryParam "limit" Int :> QueryParam "offset" Int :>  Get '[JSON] TodoResponses
+  :<|> "todos"  :> QueryParam "limit" Int :> QueryParam "offset" Int :> QueryParam "filter" TodoState :> Get '[JSON] TodoResponses
   :<|> "todos"  :> ReqBody '[JSON] TodoRequest :> Post '[JSON] TodoResponse
   :<|> "todos"  :> Delete '[JSON] Bool
   :<|> "todos"  :> Capture "todo_id" TodoId :> Get '[JSON] TodoResponse

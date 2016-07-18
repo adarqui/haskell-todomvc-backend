@@ -35,14 +35,19 @@ newTodoApp = defaultTodoApp
 
 -- | List todos with potential query params: limit, offset
 --
-listTodos :: Maybe Int -> Maybe Int -> TodoAppState TodoResponses
-listTodos m_limit m_offset = do
-  todos <- (Map.elems <$> gets _todoAppTodos)
+listTodos :: Maybe Int -> Maybe Int -> Maybe TodoState -> TodoAppState TodoResponses
+listTodos m_limit m_offset m_filter = do
+  todos <- ((applyFilter . Map.elems) <$> gets _todoAppTodos)
   pure (case (m_limit, m_offset) of
     (Just limit, Just offset) -> take limit $ drop offset todos
     (Just limit, Nothing)     -> take limit todos
     (Nothing,    Just offset) -> drop offset todos
     (Nothing,    Nothing)     -> todos)
+  where
+  applyFilter todos =
+    case m_filter of
+      Just filt -> filter ((==) filt . _todoResponseState) todos
+      Nothing   -> todos
 
 
 
