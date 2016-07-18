@@ -11,16 +11,17 @@ module Web.TodoMVC.Backend.Servant.API (
 
 
 
-import           Data.Monoid                        ((<>))
-import           Network.Wai                        (Application)
-import           Network.Wai.Handler.Warp           (run)
+import           Data.Monoid                          ((<>))
+import           Network.Wai                          (Application)
+import           Network.Wai.Handler.Warp             (run)
+import           Network.Wai.Middleware.RequestLogger (logStdoutDev)
 import           Servant
-import           Web.TodoMVC.Backend.Pure.Todo      (addTodo, clearTodos,
-                                                     findTodoById, listTodos,
-                                                     removeTodo, updateTodo)
-import           Web.TodoMVC.Backend.Servant.Shared (LnAPI, Store, apply2,
-                                                     newAppState, runApp,
-                                                     runApp_Maybe, todoAPI)
+import           Web.TodoMVC.Backend.Pure.Todo        (addTodo, clearTodos,
+                                                       findTodoById, listTodos,
+                                                       removeTodo, updateTodo)
+import           Web.TodoMVC.Backend.Servant.Shared   (LnAPI, Store, apply2,
+                                                       newAppState, runApp,
+                                                       runApp_Maybe, todoAPI)
 
 
 
@@ -56,4 +57,4 @@ runServer :: Int -> IO ()
 runServer port = do
   putStrLn $ "We will be listening on port " <> show port
   store <- newAppState
-  run port $ app store
+  run port $ logStdoutDev $ app store
