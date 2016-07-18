@@ -156,13 +156,15 @@ instance Read Param where
 
 data TodoParam = TodoParam {
   tpLimit  :: !(Maybe Int),
-  tpOffset :: !(Maybe Int)
+  tpOffset :: !(Maybe Int),
+  tpFilter :: !(Maybe TodoState)
 } deriving (Show, Eq, Ord, Generic, Typeable, NFData)
 
 defaultTodoParam :: TodoParam
 defaultTodoParam = TodoParam {
   tpLimit  = Nothing,
-  tpOffset = Nothing
+  tpOffset = Nothing,
+  tpFilter = Nothing
 }
 
 
