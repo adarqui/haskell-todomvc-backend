@@ -15,6 +15,7 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   Param (..),
   TodoParam (..),
   todoParamToQueryParamsTuple,
+  todoParamToQueryParamsText,
   defaultTodoState,
   defaultTodoRequest,
   defaultTodoResponse,
@@ -45,7 +46,7 @@ import           Data.Map            (Map)
 import qualified Data.Map            as Map (empty)
 import           Data.Monoid         ((<>))
 import           Data.Text           (Text)
-import qualified Data.Text as Text (pack)
+import qualified Data.Text           as Text (intercalate, pack)
 import           Data.Time           (UTCTime)
 import           Data.Typeable       (Typeable)
 import           GHC.Generics        (Generic)
@@ -177,6 +178,13 @@ todoParamToQueryParamsTuple TodoParam{..} =
   offset = maybe [] (\x -> [("offset", Text.pack $ show x)]) tpOffset
   filt   = maybe [] (\x -> [("filter", Text.pack $ show x)]) tpFilter
 
+todoParamToQueryParamsText :: TodoParam -> Text
+todoParamToQueryParamsText todo_param =
+  if null list
+    then ""
+    else "?" <> (Text.intercalate "&" $ map (\(k,v) -> k <> "=" <> v) list)
+  where
+  list = todoParamToQueryParamsTuple todo_param
 
 
 
