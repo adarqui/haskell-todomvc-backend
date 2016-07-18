@@ -13,11 +13,14 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   TodoState (..),
   TodoApp (..),
   TodoAppState,
+  Param (..),
+  TodoParam (..),
   TodoId,
   defaultTodoState,
   defaultTodoRequest,
   defaultTodoResponse,
   defaultTodoApp,
+  defaultTodoParam,
   todoRequestTitle,
   todoRequestState,
   todoResponseId,
@@ -27,7 +30,9 @@ module Web.TodoMVC.Backend.Pure.Todo.Types (
   todoResponseModifiedAt,
   todoAppCounter,
   todoAppTodos,
-  todoAppTimestamp
+  todoAppTimestamp,
+  todoResponseToRequest,
+  flipTodoState
 ) where
 
 
@@ -133,3 +138,38 @@ type TodoAppState a = State TodoApp a
 
 defaultTodoApp :: TodoApp
 defaultTodoApp = TodoApp Map.empty 0 Nothing
+
+
+
+data Param
+  = Param_Limit Int
+  | Param_Offset Int
+  deriving (Show, Eq, Ord, Generic, Typeable, NFData)
+
+
+
+data TodoParam = TodoParam {
+  tpLimit  :: !(Maybe Int),
+  tpOffset :: !(Maybe Int)
+} deriving (Show, Eq, Ord, Generic, Typeable, NFData)
+
+defaultTodoParam :: TodoParam
+defaultTodoParam = TodoParam {
+  tpLimit  = Nothing,
+  tpOffset = Nothing
+}
+
+
+
+
+todoResponseToRequest :: TodoResponse -> TodoRequest
+todoResponseToRequest TodoResponse{..} = TodoRequest _todoResponseTitle _todoResponseState
+
+
+
+flipTodoState :: TodoState -> TodoState
+flipTodoState st =
+  case st of
+    Active    -> Completed
+    Completed -> Active
+    _         -> st

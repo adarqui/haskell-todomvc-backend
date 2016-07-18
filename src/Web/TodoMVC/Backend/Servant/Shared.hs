@@ -53,15 +53,15 @@ type Store = TVar AppState
 -- DELETE /todos/:todo_id
 -- PUT    /todos/:todo_id
 type LnAPI =
-       "html" :> Raw
-  :<|> "dist" :> Raw
+       "html"   :> Raw
+  :<|> "dist"   :> Raw
   :<|> "static" :> Raw
-  :<|> "todos" :> Get '[JSON] TodoResponses
-  :<|> "todos" :> ReqBody '[JSON] TodoRequest :> Post '[JSON] TodoResponse
-  :<|> "todos" :> Delete '[JSON] Bool
-  :<|> "todos" :> Capture "todo_id" TodoId :> Get '[JSON] TodoResponse
-  :<|> "todos" :> Capture "todo_id" TodoId :> Delete '[JSON] TodoId
-  :<|> "todos" :> Capture "todo_id" TodoId :> ReqBody '[JSON] TodoRequest :> Put '[JSON] TodoResponse
+  :<|> "todos"  :> QueryParam "limit" Int :> QueryParam "offset" Int :>  Get '[JSON] TodoResponses
+  :<|> "todos"  :> ReqBody '[JSON] TodoRequest :> Post '[JSON] TodoResponse
+  :<|> "todos"  :> Delete '[JSON] Bool
+  :<|> "todos"  :> Capture "todo_id" TodoId :> Get '[JSON] TodoResponse
+  :<|> "todos"  :> Capture "todo_id" TodoId :> Delete '[JSON] TodoId
+  :<|> "todos"  :> Capture "todo_id" TodoId :> ReqBody '[JSON] TodoRequest :> Put '[JSON] TodoResponse
 
 
 

@@ -30,8 +30,8 @@ server :: Store -> Server LnAPI
 server store =
        serveDirectory "./html"
   :<|> serveDirectory "./dist"
-  :<|> serveDirectory "./bower_components"
-  :<|> runApp store listTodos
+  :<|> serveDirectory "./static"
+  :<|> (runApp store .) . listTodos
   :<|> runApp store . addTodo
   :<|> runApp store clearTodos
   :<|> runApp_Maybe store . findTodoById

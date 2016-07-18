@@ -10,7 +10,6 @@ module Web.TodoMVC.Backend.Pure.Todo.App (
   updateTodo,
   findTodoById,
   clearTodos,
-  runTodoGrammar,
   incrTodoAppCounter,
   lookupTimestamp
 ) where
@@ -34,10 +33,16 @@ newTodoApp = defaultTodoApp
 
 
 
--- | listTodos
+-- | List todos with potential query params: limit, offset
 --
-listTodos :: TodoAppState TodoResponses
-listTodos = use (todoAppTodos . to Map.elems)
+listTodos :: Maybe Int -> Maybe Int -> TodoAppState TodoResponses
+listTodos m_limit m_offset = do
+  todos <- (Map.elems <$> gets _todoAppTodos)
+  pure (case (m_limit, m_offset) of
+    (Just limit, Just offset) -> take limit $ drop offset todos
+    (Just limit, Nothing)     -> take limit todos
+    (Nothing,    Just offset) -> drop offset todos
+    (Nothing,    Nothing)     -> todos)
 
 
 
@@ -117,17 +122,3 @@ incrTodoAppCounter = do
 --
 lookupTimestamp :: TodoAppState (Maybe UTCTime)
 lookupTimestamp = gets _todoAppTimestamp
-
-
-
--- | runTodoGrammar
---
--- our todo application grammar in its entirety.
---
-runTodoGrammar :: TodoActionRequest -> TodoAppState TodoActionResponse
-runTodoGrammar ReqListTodos              = RespListTodos        <$> listTodos
-runTodoGrammar (ReqAddTodo todo)         = (RespAddTodo . Just) <$> addTodo todo
-runTodoGrammar (ReqRemoveTodo tid)       = RespRemoveTodo       <$> removeTodo tid
-runTodoGrammar (ReqUpdateTodo tid todo)  = RespUpdateTodo       <$> updateTodo tid todo
-runTodoGrammar (ReqFindTodoById tid)     = RespFindTodoById     <$> findTodoById tid
-runTodoGrammar ReqClearTodos             = RespClearTodos       <$> clearTodos
